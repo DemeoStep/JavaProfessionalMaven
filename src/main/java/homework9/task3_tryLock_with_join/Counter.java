@@ -1,4 +1,4 @@
-package homework9.task3_tryLock;
+package homework9.task3_tryLock_with_join;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;

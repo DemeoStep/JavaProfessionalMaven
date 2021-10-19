@@ -1,4 +1,4 @@
-package homework9.task3_tryLock;
+package homework9.task3_tryLock_with_join;
 
 public class Main {
     public static void main(String[] args) {
