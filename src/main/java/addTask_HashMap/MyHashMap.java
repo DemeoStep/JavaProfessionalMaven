@@ -7,10 +7,12 @@ import java.util.Set;
 
 public class MyHashMap<K, V> {
     private int size;
-    private int modCount;
     private final MyNode<K, V>[] table = new MyNode[10];
 
-    private int hash(K key) {
+    private int hash(K key) throws Exception {
+        if (key == null) {
+            throw new Exception("NullKeyException");
+        }
         return Math.abs(key.hashCode() % table.length);
     }
 
@@ -24,19 +26,17 @@ public class MyHashMap<K, V> {
 
     public void clear() {
         if (size != 0) {
-            modCount++;
             Arrays.fill(table, null);
             size = 0;
         }
     }
 
-    public V put(K key, V value) {
+    public V put(K key, V value) throws Exception {
         var index = hash(key);
 
         if (table[index] == null) {
             table[index] = new MyNode<>(key, value);
             size++;
-            modCount++;
             return value;
         }
 
@@ -55,22 +55,12 @@ public class MyHashMap<K, V> {
         table[index] = new MyNode<>(key, value, table[index]);
 
         size++;
-        modCount++;
         return value;
     }
 
     public V get(K key) {
-        if (table[hash(key)] != null) {
-            var node = table[hash(key)];
-            while (node != null) {
-                if (node.key.equals(key)) {
-                    return node.value;
-                }
-                node = node.next;
-            }
-        }
-
-        return null;
+        var entry = entrySet().stream().filter(e -> e.getKey().equals(key)).findFirst();
+        return entry.map(MyNode::getValue).orElse(null);
     }
 
     public Set<MyNode<K, V>> entrySet() {
@@ -111,9 +101,8 @@ public class MyHashMap<K, V> {
         return entrySet().stream().anyMatch(e -> e.getValue().equals(value));
     }
 
-    public V remove(K key) {
+    public V remove(K key) throws Exception {
         if (size != 0 && containsKey(key)) {
-            modCount++;
             size--;
 
             var index = hash(key);
@@ -144,15 +133,10 @@ public class MyHashMap<K, V> {
 
         StringBuilder str = new StringBuilder("{");
 
-        for (MyNode<K, V> node : table) {
-            if (node != null) {
-                while (node != null) {
-                    str.append(node.getKey()).append("=").append(node.getValue()).append(", ");
-                    node = node.next;
-                }
-            }
+        for (MyNode<K, V> node : entrySet()) {
+            str.append(node.getKey()).append("=").append(node.getValue()).append(", ");
         }
-        
+
         str = new StringBuilder(str.substring(0, str.length() - 2));
         str.append("}");
 
