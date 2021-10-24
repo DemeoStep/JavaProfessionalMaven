@@ -7,17 +7,32 @@ import java.util.Set;
 
 public class MyHashMap<K, V> {
     private int size;
-    private final MyNode<K, V>[] table = new MyNode[10];
+    private MyNode<K, V>[] table = new MyNode[10];
 
-    private int hash(K key) throws Exception {
-        if (key == null) {
-            throw new Exception("NullKeyException");
-        }
-        return Math.abs(key.hashCode() % table.length);
+    public int getCap() {
+        return table.length;
+    }
+
+    private int hash(K key) {
+        return key != null ? Math.abs(key.hashCode() % table.length) : 0;
     }
 
     public int size() {
         return size;
+    }
+
+    public MyNode<K, V>[] resize() {
+        if ((double) size / table.length > 0.75) {
+            var oldTable = entrySet();
+            table = new MyNode[table.length * 2];
+            size = 0;
+
+            for (var entry : oldTable) {
+                put(entry.key, entry.value);
+            }
+        }
+
+        return table;
     }
 
     public boolean isEmpty() {
@@ -31,7 +46,9 @@ public class MyHashMap<K, V> {
         }
     }
 
-    public V put(K key, V value) throws Exception {
+    public V put(K key, V value) {
+        resize();
+
         var index = hash(key);
 
         if (table[index] == null) {
@@ -43,7 +60,8 @@ public class MyHashMap<K, V> {
         var node = table[index];
 
         while (node != null) {
-            if (node.getKey().equals(key)) {
+
+            if ((node.key == null && key == null) || (node.key != null && node.key.equals(key))) {
                 V oldValue = node.getValue();
                 node.setValue(value);
                 return oldValue;
@@ -59,19 +77,27 @@ public class MyHashMap<K, V> {
     }
 
     public V get(K key) {
-        var entry = entrySet().stream().filter(e -> e.getKey().equals(key)).findFirst();
-        return entry.map(MyNode::getValue).orElse(null);
+        var index = hash(key);
+
+        var node = table[index];
+
+        while (node != null) {
+            if (node.getKey().equals(key)) {
+                return node.value;
+            }
+            node = node.next;
+        }
+
+        return null;
     }
 
     public Set<MyNode<K, V>> entrySet() {
         HashSet<MyNode<K, V>> set = new HashSet<>();
         if (size > 0) {
             for (MyNode<K, V> node : table) {
-                if (node != null) {
-                    while (node != null) {
-                        set.add(node);
-                        node = node.next;
-                    }
+                while (node != null) {
+                    set.add(node);
+                    node = node.next;
                 }
             }
         }
@@ -82,11 +108,9 @@ public class MyHashMap<K, V> {
         HashSet<K> set = new HashSet<>();
         if (size > 0) {
             for (MyNode<K, V> node : table) {
-                if (node != null) {
-                    while (node != null) {
-                        set.add(node.getKey());
-                        node = node.next;
-                    }
+                while (node != null) {
+                    set.add(node.getKey());
+                    node = node.next;
                 }
             }
         }
@@ -94,32 +118,55 @@ public class MyHashMap<K, V> {
     }
 
     public boolean containsKey(K key) {
-        return keySet().contains(key);
+        var node = table[hash(key)];
+
+        if (size != 0 && node != null) {
+            while (node != null) {
+                if ((node.key == null && key == null) || (node.key != null && node.key.equals(key))) {
+                    return true;
+                }
+                node = node.next;
+            }
+        }
+
+        return false;
     }
 
     public boolean containsValue(V value) {
-        return entrySet().stream().anyMatch(e -> e.getValue().equals(value));
+        if (size != 0) {
+            for (var node : table) {
+                while (node != null) {
+                    if ((node.value == null && value == null) || (node.value != null && node.value.equals(value))) {
+                        return true;
+                    }
+                    node = node.next;
+                }
+            }
+        }
+
+        return false;
     }
 
-    public V remove(K key) throws Exception {
-        if (size != 0 && containsKey(key)) {
+    public V remove(K key) {
+        var index = hash(key);
+        var node = table[index];
+
+        if (size != 0 && node != null) {
             size--;
 
-            var index = hash(key);
-            var node = table[index];
-            var nodeToRemove = get(key);
-
-            if (node.key.equals(key)) {
+            if ((node.key == null && key == null) || (node.key != null && node.key.equals(key))) {
                 table[index] = node.next;
-                return nodeToRemove;
+                return node.value;
             }
 
-            while (!node.next.key.equals(key)) {
+            while ((node.next.key != null && !node.next.key.equals(key)) || (node.next.key == null && key != null)) {
                 node = node.next;
             }
 
+            var nodeToRemove = node.next;
+
             node.next = node.next.next;
-            return nodeToRemove;
+            return nodeToRemove.value;
         }
 
         return null;
@@ -133,8 +180,11 @@ public class MyHashMap<K, V> {
 
         StringBuilder str = new StringBuilder("{");
 
-        for (MyNode<K, V> node : entrySet()) {
-            str.append(node.getKey()).append("=").append(node.getValue()).append(", ");
+        for (MyNode<K, V> node : table) {
+            while (node != null) {
+                str.append(node.getKey()).append("=").append(node.getValue()).append(", ");
+                node = node.next;
+            }
         }
 
         str = new StringBuilder(str.substring(0, str.length() - 2));
