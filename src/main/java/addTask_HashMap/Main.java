@@ -1,14 +1,7 @@
 package addTask_HashMap;
 
-import java.util.HashMap;
-
 public class Main {
     public static void main(String[] args) throws Exception {
-        HashMap<String, String> hashMap = new HashMap<>();
-
-        hashMap.put(null, null);
-
-        System.out.println(hashMap.get(null));
 
         MyHashMap<String, String> my = new MyHashMap<>();
 
@@ -33,7 +26,9 @@ public class Main {
         my.put("seven", "7");
         System.out.println("Capacity: " + my.getCap() + " " + my);
 
-        System.out.println(my.get(null));
+        System.out.println(my.remove("null"));
+
+        System.out.println(my);
 
     }
 }
