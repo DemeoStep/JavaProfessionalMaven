@@ -26,9 +26,5 @@ public class Main {
         my.put("seven", "7");
         System.out.println("Capacity: " + my.getCap() + " " + my);
 
-        System.out.println(my.size());
-        System.out.println(my.remove("wto"));
-        System.out.println(my.size());
-
     }
 }
