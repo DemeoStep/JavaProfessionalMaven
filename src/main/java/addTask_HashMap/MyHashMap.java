@@ -85,7 +85,7 @@ public class MyHashMap<K, V> {
         var node = table[index];
 
         while (node != null) {
-            if (node.getKey().equals(key) || (node.key == null && key == null)) {
+            if ((node.key != null && node.getKey().equals(key)) || (node.key == null && key == null)) {
                 return node.value;
             }
             node = node.next;

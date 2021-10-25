@@ -26,7 +26,7 @@ public class Main {
         System.out.println("Capacity: " + my.getCap() + " " + my);
         my.put("six", "6");
         System.out.println("Capacity: " + my.getCap() + " " + my);
-        my.put(null, "nnnull");
+        my.put(null, null);
         System.out.println("Capacity: " + my.getCap() + " " + my);
         my.put("isx", null);
         System.out.println("Capacity: " + my.getCap() + " " + my);
