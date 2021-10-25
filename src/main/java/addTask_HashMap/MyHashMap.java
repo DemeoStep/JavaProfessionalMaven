@@ -21,14 +21,17 @@ public class MyHashMap<K, V> {
         return size;
     }
 
-    public MyNode<K, V>[] resize() {
+    private MyNode<K, V>[] resize() {
         if ((double) size / table.length > 0.75) {
-            var oldTable = entrySet();
+            var oldTable = table;
             table = new MyNode[table.length * 2];
             size = 0;
 
-            for (var entry : oldTable) {
-                put(entry.key, entry.value);
+            for (MyNode<K, V> node : oldTable) {
+                while (node != null) {
+                    put(node.key, node.value);
+                    node = node.next;
+                }
             }
         }
 
@@ -152,21 +155,25 @@ public class MyHashMap<K, V> {
         var node = table[index];
 
         if (size != 0 && node != null) {
-            size--;
 
             if ((node.key == null && key == null) || (node.key != null && node.key.equals(key))) {
                 table[index] = node.next;
+                size--;
                 return node.value;
             }
 
-            while ((node.next.key != null && !node.next.key.equals(key)) || (node.next.key == null && key != null)) {
-                node = node.next;
+            if (node.next != null) {
+
+                while ((node.next.key != null && !node.next.key.equals(key)) || (node.next.key == null && key != null)) {
+                    node = node.next;
+                }
+
+                var nodeToRemove = node.next;
+
+                node.next = node.next.next;
+                size--;
+                return nodeToRemove.value;
             }
-
-            var nodeToRemove = node.next;
-
-            node.next = node.next.next;
-            return nodeToRemove.value;
         }
 
         return null;
