@@ -3,6 +3,7 @@ package addTask_HashMap;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 
 public class MyHashMap<K, V> {
@@ -64,7 +65,7 @@ public class MyHashMap<K, V> {
 
         while (node != null) {
 
-            if ((node.key == null && key == null) || (node.key != null && node.key.equals(key))) {
+            if (Objects.equals(node.key, key)) {
                 V oldValue = node.getValue();
                 node.setValue(value);
                 return oldValue;
@@ -85,7 +86,7 @@ public class MyHashMap<K, V> {
         var node = table[index];
 
         while (node != null) {
-            if ((node.key != null && node.getKey().equals(key)) || (node.key == null && key == null)) {
+            if (Objects.equals(node.key, key)) {
                 return node.value;
             }
             node = node.next;
@@ -125,7 +126,7 @@ public class MyHashMap<K, V> {
 
         if (size != 0 && node != null) {
             while (node != null) {
-                if ((node.key == null && key == null) || (node.key != null && node.key.equals(key))) {
+                if (Objects.equals(node.key, key)) {
                     return true;
                 }
                 node = node.next;
@@ -139,7 +140,7 @@ public class MyHashMap<K, V> {
         if (size != 0) {
             for (var node : table) {
                 while (node != null) {
-                    if ((node.value == null && value == null) || (node.value != null && node.value.equals(value))) {
+                    if (Objects.equals(node.value, value)) {
                         return true;
                     }
                     node = node.next;
@@ -156,7 +157,7 @@ public class MyHashMap<K, V> {
 
         if (size != 0 && node != null) {
 
-            if ((node.key == null && key == null) || (node.key != null && node.key.equals(key))) {
+            if (Objects.equals(node.key, key)) {
                 table[index] = node.next;
                 size--;
                 return node.value;
@@ -164,7 +165,7 @@ public class MyHashMap<K, V> {
 
             if (node.next != null) {
 
-                while ((node.next.key != null && !node.next.key.equals(key)) || (node.next.key == null && key != null)) {
+                while (Objects.equals(node.key, key)) {
                     node = node.next;
                 }
 
